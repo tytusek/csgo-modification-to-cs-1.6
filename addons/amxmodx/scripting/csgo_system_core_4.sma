@@ -63,6 +63,16 @@ new rank_position[33];
 new rank_max=0;
 new bool:oneTimeGetRank[33]=false;
 
+new g_pCvars[CVARS];
+
+enum CVARS
+{ 
+	host, 
+	user, 
+	pass, 
+	db
+};
+
 new const RANK[][] = 
 {
 	{20, "Silver I"},
@@ -142,6 +152,12 @@ public plugin_end()
 public plugin_init()
 {
 	register_plugin("[CSGO] System: Core", "1.0", "TyTuS")
+
+	g_pCvars[host] = register_cvar("csgo_host_sql", 	"127.0.0.1");
+	g_pCvars[user] = register_cvar("csgo_user_sql", 	"root",	    FCVAR_PROTECTED);
+	g_pCvars[pass] = register_cvar("csgo_password_sql", 	"password", FCVAR_PROTECTED);
+	g_pCvars[db]   = register_cvar("csgo_database_sql",   	"database");
+
 	register_clcmd("say /menu", "menuCore");
 	register_clcmd("say /rangi", "menuSystemRank")
 	register_clcmd("say /skin", "menuCore");
@@ -167,7 +183,12 @@ public plugin_init()
 
 public plugin_cfg()
 {
-	info = SQL_MakeDbTuple("193.33.177.152", "user", "pass", "base..."); 
+	new szHost[64], szUser[64], szPass[64], szDB[64];
+	get_pcvar_string(g_pCvars[host], szHost, charsmax(szHost));
+	get_pcvar_string(g_pCvars[user], szUser, charsmax(szUser));
+	get_pcvar_string(g_pCvars[pass], szPass, charsmax(szPass));
+	get_pcvar_string(g_pCvars[db],   szDB,   charsmax(szDB));
+	info = SQL_MakeDbTuple(szHost, szUser, szPass, szDB); 
 
 	new len_full, temp_full[2024]; 
 	len_full += formatex(temp_full[len_full], charsmax(temp_full)-len_full, "CREATE TABLE IF NOT EXISTS `csgo` (`name` VARCHAR(48), `steam` VARCHAR(48), `ip` VARCHAR(48), `pass` VARCHAR(48), `register` TINYINT(1), `kills` INT(10), `deads` INT(10), `assists` INT(10), `hs` INT(10),");  
